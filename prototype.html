@@ -1,77 +1,72 @@
-<!-- السطر الأول -->
+<!-- الصف الأول -->
 <div class="row">
     <div>
         <label>أرقام اللوحة *</label>
-        <input type="text" id="plate_numbers" placeholder="1234" required>
+        <input id="plate_numbers" placeholder="1234">
     </div>
 
     <div>
         <label>حروف اللوحة *</label>
-        <input type="text" id="plate_letters" placeholder="ABC" required>
+        <input id="plate_letters" placeholder="ABC">
     </div>
 
     <div>
         <label>براند السيارة *</label>
-        <select id="car_type" required>
-            <option value="">— اختر البراند —</option>
+        <select id="car_type">
+            <option value="">اختر البراند</option>
         </select>
     </div>
 
     <div>
         <label>موديل السيارة *</label>
-        <select id="car_model" required>
-            <option value="">— اختر الموديل —</option>
+        <select id="car_model">
+            <option value="">اختر الموديل</option>
         </select>
     </div>
 </div>
 
-<!-- السطر الثاني -->
+<!-- الصف الثاني -->
 <div class="row">
     <div>
         <label>نوع الخدمة *</label>
-        <select id="service_type" required>
-            <option value="">— اختر النوع —</option>
+        <select id="service_type">
+            <option value="">اختر النوع</option>
         </select>
     </div>
 
     <div>
         <label>تفاصيل الخدمة *</label>
-        <select id="service_detail" required>
-            <option value="">— اختر الخدمة —</option>
+        <select id="service_detail">
+            <option value="">اختر الخدمة</option>
         </select>
     </div>
 
     <div>
         <label>الموظف *</label>
-        <select id="employee_in" required>
-            <option value="">— اختر الموظف —</option>
+        <select id="employee_in">
+            <option value="">اختر الموظف</option>
         </select>
     </div>
 
     <div>
         <label>رقم الموقف *</label>
-        <select id="parking_slot" required>
-            <option value="">— اختر الموقف —</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+        <select id="parking_slot">
+            <option value="">اختر الموقف</option>
         </select>
     </div>
 </div>
 
-<!-- السطر الثالث -->
-<div class="row">
+<!-- الصف الثالث (5 خانات) -->
+<div class="row-5">
     <div>
         <label>السعر</label>
-        <input type="number" id="price" readonly>
+        <input id="price" readonly>
     </div>
 
     <div>
         <label>حالة الدفع *</label>
-        <select id="payment_status" required>
-            <option value="">— اختر الحالة —</option>
+        <select id="payment_status">
+            <option value="">اختر الحالة</option>
             <option value="مدفوع">مدفوع</option>
             <option value="غير مدفوع">غير مدفوع</option>
         </select>
@@ -80,7 +75,7 @@
     <div>
         <label>طريقة الدفع *</label>
         <select id="payment_method">
-            <option value="">— اختر الطريقة —</option>
+            <option value="">اختر الطريقة</option>
             <option value="كاش">كاش</option>
             <option value="شبكة">شبكة</option>
             <option value="جزئي">جزئي</option>
@@ -89,14 +84,11 @@
 
     <div>
         <label>الخصم</label>
-        <input type="number" id="discount" value="0">
+        <input id="discount" value="0">
     </div>
-</div>
 
-<!-- الإكرامية -->
-<div class="row">
     <div>
         <label>الإكرامية</label>
-        <input type="number" id="tip" value="0">
+        <input id="tip" value="0">
     </div>
 </div>
