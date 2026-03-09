@@ -204,7 +204,7 @@
 
     <h3 class="section-title">📝 تسجيل زيارة جديدة</h3>
 
-    <!-- لوحة -->
+    <!-- الصف الأول: 4 خانات -->
     <div class="row">
         <div>
             <label>أرقام اللوحة *</label>
@@ -215,10 +215,7 @@
             <label>حروف اللوحة</label>
             <input id="plate_letters" placeholder="ABC">
         </div>
-    </div>
 
-    <!-- السيارة -->
-    <div class="row">
         <div>
             <label>براند السيارة *</label>
             <select id="car_type"></select>
@@ -230,14 +227,7 @@
         </div>
     </div>
 
-    <div class="row">
-        <div>
-            <label>الحجم</label>
-            <input id="car_size" readonly>
-        </div>
-    </div>
-
-    <!-- الخدمة -->
+    <!-- الصف الثاني: 4 خانات -->
     <div class="row">
         <div>
             <label>نوع الخدمة *</label>
@@ -248,13 +238,64 @@
             <label>تفاصيل الخدمة *</label>
             <select id="service_detail"></select>
         </div>
+
+        <div>
+            <label>الموظف *</label>
+            <select id="employee_in"></select>
+        </div>
+
+        <div>
+            <label>رقم الموقف *</label>
+            <select id="parking_slot">
+                <option value="">اختر</option>
+                <option>1</option><option>2</option><option>3</option>
+                <option>4</option><option>5</option><option>6</option>
+            </select>
+        </div>
     </div>
 
-    <!-- السعر والنقاط -->
-    <div class="row">
+    <!-- الصف الثالث: 5 خانات -->
+    <div class="row-5">
         <div>
             <label>السعر</label>
             <input id="price" readonly>
+        </div>
+
+        <div>
+            <label>حالة الدفع *</label>
+            <select id="payment_status">
+                <option value="">اختر</option>
+                <option value="مدفوع">مدفوع</option>
+                <option value="غير مدفوع">غير مدفوع</option>
+            </select>
+        </div>
+
+        <div>
+            <label>طريقة الدفع *</label>
+            <select id="payment_method">
+                <option value="">اختر</option>
+                <option value="كاش">كاش</option>
+                <option value="شبكة">شبكة</option>
+                <option value="جزئي">جزئي</option>
+            </select>
+        </div>
+
+        <div>
+            <label>الخصم</label>
+            <input id="discount" value="0">
+        </div>
+
+        <div>
+            <label>الإكرامية</label>
+            <input id="tip" value="0">
+        </div>
+    </div>
+
+    <!-- الحجم + النقاط تحت الصفوف -->
+    <div class="row">
+        <div>
+            <label>الحجم</label>
+            <input id="car_size" readonly>
         </div>
 
         <div>
@@ -269,66 +310,6 @@
     <div id="servicesList" class="services-box"></div>
 
     <div class="total">الإجمالي: <span id="totalPrice">0</span> ريال</div>
-
-    <!-- خصم / إكرامية -->
-    <div class="row">
-        <div>
-            <label>الخصم</label>
-            <input id="discount" value="0">
-        </div>
-
-        <div>
-            <label>الإكرامية</label>
-            <input id="tip" value="0">
-        </div>
-    </div>
-
-    <!-- موقف -->
-    <div class="row">
-        <div>
-            <label>رقم الموقف *</label>
-            <select id="parking_slot">
-                <option value="">اختر</option>
-                <option>1</option><option>2</option><option>3</option>
-                <option>4</option><option>5</option><option>6</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- موظف / فرع -->
-    <div class="row">
-        <div>
-            <label>الموظف *</label>
-            <select id="employee_in"></select>
-        </div>
-
-        <div>
-            <label>الفرع *</label>
-            <select id="branch"></select>
-        </div>
-    </div>
-
-    <!-- الدفع -->
-    <div class="row">
-        <div>
-            <label>حالة الدفع *</label>
-            <select id="payment_status">
-                <option value="">اختر</option>
-                <option value="مدفوع">مدفوع</option>
-                <option value="غير مدفوع">غير مدفوع</option>
-            </select>
-        </div>
-
-        <div id="payment_method_wrapper" style="display:none;">
-            <label>طريقة الدفع *</label>
-            <select id="payment_method">
-                <option value="">اختر</option>
-                <option value="كاش">كاش</option>
-                <option value="شبكة">شبكة</option>
-                <option value="جزئي">جزئي</option>
-            </select>
-        </div>
-    </div>
 
     <!-- دفع جزئي -->
     <div id="partial_payment_box" style="display:none;">
