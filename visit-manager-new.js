@@ -2,11 +2,28 @@
    عناصر أساسية
 =========================== */
 
+const el = id => document.getElementById(id);
+
 const carsContainer = document.getElementById("carsContainer");
 const btnAddCar = document.getElementById("btnAddCar");
 const btnSubmitVisit = document.getElementById("btnSubmitVisit");
 const template = document.getElementById("carCardTemplate");
 
+let activeVisits = [];
+let carTypesData = [];
+let servicesData = [];
+let employeesData = [];
+
+/* ===========================
+   تحميل البيانات الأساسية عند فتح الصفحة
+=========================== */
+
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadCarTypes();
+    await loadServices();
+    await loadEmployees();
+    await loadActiveVisits();
+});
 /* ===========================
    إضافة سيارة جديدة
 =========================== */
