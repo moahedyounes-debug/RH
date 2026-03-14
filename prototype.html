@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رغوة الهجين - إدارة الزيارات</title>
+
+<link rel="stylesheet" href="prototype.css">
+<script src="api.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رغوة الهجين - إدارة الزيارات</title>
-    <link rel="stylesheet" href="prototype.css">
+    <link rel="stylesheet" href="visit-manager.css">
     <script src="api.js"></script>
 </head>
 <body>
+
+<div class="container">
+
+    <!-- العنوان -->
+    <div class="page-header">
+        <h1>رغوة الهجين</h1>
+        <h2>إدارة الزيارات</h2>
     <div class="container">
         <!-- العنوان -->
         <div class="page-header">
@@ -40,218 +54,278 @@
             <button id="btnRefreshActive" class="btn-secondary full">🔄 تحديث القائمة</button>
         </div>
 
-        <!-- تسجيل الزيارة -->
-        <div id="visitBox" class="section">
-            <h3 class="section-title">📝 تسجيل زيارة جديدة</h3>
+<!-- تسجيل الزيارة -->
+<div id="visitBox" class="section">
 
-            <!-- بيانات اللوحة -->
-            <div class="row">
-                <div>
-                    <label>أرقام اللوحة *</label>
-                    <input type="text" id="plate_numbers" placeholder="1234" required>
-                </div>
-                <div>
-                    <label>حروف اللوحة</label>
-                    <input type="text" id="plate_letters" placeholder="ABC">
-                </div>
-            </div>
+<h3 class="section-title">📝 تسجيل زيارة جديدة</h3>
 
-            <!-- السيارة -->
-            <div class="row">
-                <div>
-                    <label>براند السيارة *</label>
-                    <select id="car_type" required>
-                        <option value="">— اختر البراند —</option>
-                    </select>
-                </div>
-                <div>
-                    <label>موديل السيارة *</label>
-                    <select id="car_model" required>
-                        <option value="">— اختر الموديل —</option>
-                    </select>
-                </div>
-            </div>
+<!-- الصف الأول -->
+<div class="row">
+    <div>
+        <label>أرقام اللوحة *</label>
+        <input type="text" id="plate_numbers" placeholder="1234" required>
+</div>
 
-            <div class="row">
-                <div>
-                    <label>الحجم</label>
-                    <input type="text" id="car_size" readonly>
-                </div>
-            </div>
-
-            <!-- الخدمة -->
-            <div class="row">
-                <div>
-                    <label>نوع الخدمة *</label>
-                    <select id="service_type" required>
-                        <option value="">— اختر النوع —</option>
-                    </select>
-                </div>
-                <div>
-                    <label>تفاصيل الخدمة *</label>
-                    <select id="service_detail" required>
-                        <option value="">— اختر الخدمة —</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- السعر والنقاط -->
-            <div class="row">
-                <div>
-                    <label>السعر</label>
-                    <input type="number" id="price" readonly>
-                </div>
-                <div>
-                    <label>النقاط / العمولة</label>
-                    <input type="number" id="points" readonly>
-                </div>
-            </div>
-
-            <!-- إضافة خدمة -->
-            <button id="btnAddService" class="btn-secondary full">➕ إضافة خدمة</button>
-
-            <div id="servicesList" class="services-box"></div>
-
-            <div class="total">الإجمالي: <span id="totalPrice">0</span> ريال</div>
-
-            <!-- الخصم / الإكرامية / الموقف -->
-            <div class="row">
-                <div>
-                    <label>الخصم</label>
-                    <input type="number" id="discount" placeholder="0" value="0">
-                </div>
-                <div>
-                    <label>الإكرامية</label>
-                    <input type="number" id="tip" placeholder="0" value="0">
-                </div>
-            </div>
-
-            <div class="row">
-                <div>
-                    <label>رقم الموقف *</label>
-                    <select id="parking_slot" required>
-                        <option value="">— اختر الموقف —</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- الموظف والفرع -->
-            <div class="row">
-                <div>
-                    <label>الموظف *</label>
-                    <select id="employee_in" required>
-                        <option value="">— اختر الموظف —</option>
-                    </select>
-                </div>
-                <div>
-                    <label>الفرع *</label>
-                    <select id="branch" required>
-                        <option value="">— اختر الفرع —</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- الدفع -->
-            <div class="row">
-                <div>
-                    <label>حالة الدفع *</label>
-                    <select id="payment_status" required>
-                        <option value="">— اختر الحالة —</option>
-                        <option value="مدفوع">مدفوع</option>
-                        <option value="غير مدفوع">غير مدفوع</option>
-                    </select>
-                </div>
-                <div id="payment_method_wrapper" style="display:none;">
-                    <label>طريقة الدفع *</label>
-                    <select id="payment_method">
-                        <option value="">— اختر الطريقة —</option>
-                        <option value="كاش">كاش</option>
-                        <option value="شبكة">شبكة</option>
-                        <option value="جزئي">جزئي (كاش + شبكة)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- الدفع الجزئي -->
-            <div id="partial_payment_box" style="display:none; margin-top:15px;">
-                <div class="row">
-                    <div>
-                        <label>مبلغ الكاش</label>
-                        <input type="number" id="cash_amount" placeholder="0">
-                    </div>
-                    <div>
-                        <label>مبلغ الشبكة</label>
-                        <input type="number" id="card_amount" placeholder="0">
-                    </div>
-                </div>
-                <div class="total">المجموع المدفوع: <span id="paid_total">0</span> ريال</div>
-            </div>
-
-            <button id="btnSubmitVisit" class="btn-primary full" style="margin-top:20px;" onclick="submitVisit()">💾 تسجيل الزيارة</button>
-        </div>
-    </div>
-
-<!-- مودال الدفع -->
-<div id="paymentModal" class="modal-overlay">
-    <div class="modal-box">
-
-        <div class="modal-header">
-            <h3>💳 تحديث الدفع</h3>
-            <button id="closePaymentModal" class="btn-danger small">✕</button>
+    <!-- شريط الملخص -->
+    <div class="summary-bar">
+        <div class="summary-item">
+            <div class="label">الخدمات الحالية</div>
+            <div class="value" id="summaryActive">0</div>
         </div>
 
-        <label>طريقة الدفع</label>
-        <select id="modal_method_select">
-            <option value="كاش">كاش</option>
-            <option value="شبكة">شبكة</option>
-            <option value="جزئي">جزئي (كاش + شبكة)</option>
+        <div class="summary-item">
+            <div class="label">السيارات حالياً</div>
+            <div class="value" id="summaryCars">0</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="label">إجمالي المستحق</div>
+            <div class="value" id="summaryTotal">0 ريال</div>
+        </div>
+    <div>
+        <label>حروف اللوحة</label>
+        <input type="text" id="plate_letters" placeholder="ABC">
+</div>
+
+    <!-- السيارات داخل المغسلة -->
+    <div class="section">
+        <h3 class="section-title">🚗 سيارات داخل المغسلة (غير مدفوعة)</h3>
+
+        <div id="activeVisitsList" class="cards">
+            <div class="loading">جارِ التحميل...</div>
+        </div>
+
+        <button id="btnRefreshActive" class="btn-secondary full">🔄 تحديث القائمة</button>
+    <div>
+        <label>براند السيارة *</label>
+        <select id="car_type" required>
+            <option value="">— اختر —</option>
         </select>
+</div>
 
-        <p><b>الإجمالي قبل الخصم:</b> <span id="modal_total_before">0 ريال</span></p>
+    <!-- زر إضافة سيارة -->
+    <button id="btnAddCar" class="btn-secondary full" style="margin-bottom:20px;">
+        + إضافة سيارة
+    </button>
 
-        <!-- الخصم -->
-        <div style="margin-top:15px;">
-            <label>الخصم</label>
-            <input type="number" id="modal_discount_input" placeholder="0">
-        </div>
+    <!-- هنا تضاف السيارات -->
+    <div id="carsContainer"></div>
 
-        <p><b>الخصم الحالي:</b> <span id="modal_discount">0 ريال</span></p>
-
-        <p><b>الإجمالي بعد الخصم:</b> <span id="modal_total_after">0 ريال</span></p>
-
-        <!-- الإكرامية -->
-        <div style="margin-top:15px;">
-            <label>الإكرامية</label>
-            <input type="number" id="modal_tip_input" placeholder="0">
-        </div>
-
-        <p><b>الإكرامية الحالية:</b> <span id="modal_tip">0 ريال</span></p>
-
-        <!-- الدفع الجزئي -->
-        <div id="cash_box" style="display:none; margin-top:15px;">
-            <label>مبلغ الكاش</label>
-            <input type="number" id="modal_cash" placeholder="0">
-        </div>
-
-        <div id="card_box" style="display:none; margin-top:15px;">
-            <label>مبلغ الشبكة</label>
-            <input type="number" id="modal_card" placeholder="0">
-        </div>
-
-        <div class="modal-actions">
-            <button id="modal_confirm" class="btn-primary">✅ تأكيد</button>
-            <button id="modal_close" class="btn-secondary">إغلاق</button>
-        </div>
-
+    <div>
+        <label>موديل السيارة *</label>
+        <select id="car_model" required>
+            <option value="">— اختر —</option>
+        </select>
     </div>
 </div>
 
+<!-- قالب السيارة -->
+<template id="carCardTemplate">
+<div class="section car-card visit-card" style="position:relative;">
+
+    <button class="btn-danger" style="position:absolute; top:10px; left:10px;"
+            onclick="this.parentElement.remove(); updateSubmitButton();">
+        ✕
+    </button>
+
+    <h3 class="section-title">🚗 سيارة جديدة</h3>
+
+    <!-- الصف الأول: 4 خانات -->
+    <div class="row">
+        <div>
+            <label>أرقام اللوحة *</label>
+            <input class="plate_numbers" placeholder="1234">
+        </div>
+
+        <div>
+            <label>حروف اللوحة</label>
+            <input class="plate_letters" placeholder="ABC">
+        </div>
+<!-- الصف الثاني -->
+<div class="row">
+    <div>
+        <label>نوع الخدمة *</label>
+        <select id="service_type" required>
+            <option value="">— اختر —</option>
+        </select>
+    </div>
+
+        <div>
+            <label>براند السيارة *</label>
+            <select class="car_type"></select>
+        </div>
+    <div>
+        <label>تفاصيل الخدمة *</label>
+        <select id="service_detail" required>
+            <option value="">— اختر —</option>
+        </select>
+    </div>
+
+        <div>
+            <label>موديل السيارة *</label>
+            <select class="car_model"></select>
+        </div>
+    <div>
+        <label>السعر</label>
+        <input type="number" id="price" readonly>
+</div>
+
+    <!-- الصف الثاني: 4 خانات -->
+    <div class="row">
+        <div>
+            <label>نوع الخدمة *</label>
+            <select class="service_type"></select>
+        </div>
+    <div>
+        <label>النقاط / العمولة</label>
+        <input type="number" id="points" readonly>
+    </div>
+</div>
+
+        <div>
+            <label>تفاصيل الخدمة *</label>
+            <select class="service_detail"></select>
+        </div>
+<!-- الصف الثالث -->
+<div class="row">
+    <div>
+        <label>الموظف *</label>
+        <select id="employee_in" required>
+            <option value="">— اختر —</option>
+        </select>
+    </div>
+
+        <div>
+            <label>الموظف *</label>
+            <select class="employee_in"></select>
+        </div>
+    <div>
+        <label>رقم الموقف *</label>
+        <select id="parking_slot" required>
+            <option value="">— اختر —</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+    </div>
+
+        <div>
+            <label>رقم الموقف *</label>
+            <select class="parking_slot">
+                <option value="">اختر</option>
+                <option>1</option><option>2</option><option>3</option>
+                <option>4</option><option>5</option><option>6</option>
+            </select>
+        </div>
+    <div>
+        <label>الخصم</label>
+        <input type="number" id="discount" value="0">
+</div>
+
+    <!-- الصف الثالث: 5 خانات -->
+    <div class="row-5">
+        <div>
+            <label>السعر</label>
+            <input class="price" readonly>
+        </div>
+    <div>
+        <label>الإكرامية</label>
+        <input type="number" id="tip" value="0">
+    </div>
+</div>
+
+        <div>
+            <label>حالة الدفع *</label>
+            <select class="payment_status">
+                <option value="">اختر</option>
+                <option value="مدفوع">مدفوع</option>
+                <option value="غير مدفوع">غير مدفوع</option>
+            </select>
+        </div>
+<!-- الصف الرابع -->
+<div class="row">
+    <div>
+        <label>حالة الدفع *</label>
+        <select id="payment_status" required>
+            <option value="">— اختر —</option>
+            <option value="مدفوع">مدفوع</option>
+            <option value="غير مدفوع">غير مدفوع</option>
+        </select>
+    </div>
+
+        <div>
+            <label>طريقة الدفع *</label>
+            <select class="payment_method">
+                <option value="">اختر</option>
+                <option value="كاش">كاش</option>
+                <option value="شبكة">شبكة</option>
+                <option value="جزئي">جزئي</option>
+            </select>
+        </div>
+    <div>
+        <label>طريقة الدفع *</label>
+        <select id="payment_method">
+            <option value="">— اختر —</option>
+            <option value="كاش">كاش</option>
+            <option value="شبكة">شبكة</option>
+            <option value="جزئي">جزئي</option>
+        </select>
+    </div>
+
+        <div>
+            <label>الخصم</label>
+            <input class="discount" value="0">
+        </div>
+    <div id="cash_box" style="display:none;">
+        <label>مبلغ الكاش</label>
+        <input type="number" id="cash_amount" value="0">
+    </div>
+
+        <div>
+            <label>الإكرامية</label>
+            <input class="tip" value="0">
+        </div>
+    <div id="card_box" style="display:none;">
+        <label>مبلغ الشبكة</label>
+        <input type="number" id="card_amount" value="0">
+</div>
+</div>
+
+    <!-- الحجم + النقاط -->
+    <div class="row">
+        <div>
+            <label>الحجم</label>
+            <input class="car_size" readonly>
+        </div>
+<!-- الخدمات -->
+<button id="btnAddService" class="btn-secondary full">➕ إضافة خدمة</button>
+
+        <div>
+            <label>النقاط / العمولة</label>
+            <input class="points" readonly>
+        </div>
+    </div>
+<div id="servicesList" class="services-box"></div>
+
+    <!-- الخدمات -->
+    <button class="btn-secondary full btnAddService">+ إضافة خدمة</button>
+<div class="total">الإجمالي: <span id="totalPrice">0</span> ريال</div>
+
+    <div class="services-box servicesList"></div>
+<button id="btnSubmitVisit" class="btn-primary full" style="margin-top:20px;" onclick="submitVisit()">💾 تسجيل الزيارة</button>
+
+    <div class="total">الإجمالي: <span class="totalPrice">0</span> ريال</div>
+</div>
+
+</div>
+</template>
+
+<!-- زر تسجيل الزيارة -->
+<div style="padding:20px;">
+    <button id="btnSubmitVisit" class="btn-primary full" onclick="submitVisit()">💾 تسجيل الزيارة</button>
     <!-- مودال التعديل -->
     <div id="editModal" class="modal-overlay">
         <div class="modal-box large">
@@ -280,6 +354,36 @@
     <button id="swapConfirm" class="btn-primary full">تأكيد التبديل</button>
 </div>
 
+<!-- مودالات + JS -->
+<script src="visit-manager.js"></script>
+
+<!-- سكربت إضافة السيارات -->
+<script>
+const carsContainer = document.getElementById("carsContainer");
+const btnAddCar = document.getElementById("btnAddCar");
+const submitBtn = document.getElementById("btnSubmitVisit");
+
+// إضافة سيارة جديدة
+btnAddCar.addEventListener("click", () => {
+    const template = document.getElementById("carCardTemplate");
+    const clone = template.content.cloneNode(true);
+    carsContainer.appendChild(clone);
+    updateSubmitButton();
+});
+
+// تحديث نص زر التسجيل
+function updateSubmitButton() {
+    const carCards = document.querySelectorAll(".visit-card");
+    if (carCards.length > 1) {
+        submitBtn.textContent = "💾 تسجيل الزيارات";
+    } else {
+        submitBtn.textContent = "💾 تسجيل الزيارة";
+    }
+}
+
+// أول تحميل
+updateSubmitButton();
+</script>
                 <div id="tab-delete" class="tab-pane">
                     <label>اختر الخدمة المراد حذفها</label>
                     <select id="deleteServiceSelect"></select>
