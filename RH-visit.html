@@ -210,19 +210,25 @@
     </div>
 </div>
 
+<!-- زر إضافة خدمة -->
 <button id="btnAddService" class="btn-secondary full">➕ إضافة خدمة</button>
 
 <div id="servicesList"></div>
 
-<div class="total">الإجمالي: <span id="totalPrice">0</span> ريال</div>
-
-<button id="btnSubmitVisit" class="btn-primary full" onclick="submitVisit()">💾 تسجيل الزيارة</button>
-
+<div class="total">
+    الإجمالي: <span id="totalPrice">0</span> ريال
 </div>
+
+</div> <!-- نهاية كرت السيارة الأساسية -->
 
 <!-- زر إضافة سيارة جديدة -->
 <button id="btnAddCar" class="btn-secondary full" style="margin-top:25px;">
     ➕ إضافة سيارة جديدة
+</button>
+
+<!-- هنا 👇 نضع زر تسجيل الزيارة -->
+<button id="btnSubmitVisit" class="btn-primary full" onclick="submitVisit()" style="margin-top:30px;">
+    💾 تسجيل الزيارة
 </button>
 
 <!-- حاوية السيارات الإضافية -->
@@ -708,57 +714,69 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* إرسال السيارات الإضافية */
-    async function submitExtraCars(mainVisitId) {
-        const cards = document.querySelectorAll(".car-card");
+    /* إرسال سيارة واحدة */
+    async function submitSingleCar(card, membership) {
 
-        for (const card of cards) {
+        if (!isCarValid(card)) return;
 
-            if (!isCarValid(card)) continue;
+        const services = [];
 
-            const payload = {
-                visit_id: mainVisitId,
-                plate_numbers: card.querySelector(".plate_numbers").value,
-                plate_letters: card.querySelector(".plate_letters").value,
-                car_type: card.querySelector(".car_type").value,
-                car_model: card.querySelector(".car_model").value,
-                car_size: card.querySelector(".car_size").value,
-                service_type: card.querySelector(".service_type").value,
-                service_detail: card.querySelector(".service_detail").value,
-                employee_in: card.querySelector(".employee_in").value,
-                branch: card.querySelector(".branch").value,
-                parking_slot: card.querySelector(".parking_slot").value,
-                payment_status: card.querySelector(".payment_status").value,
-                payment_method: card.querySelector(".payment_method").value,
-                cash_amount: card.querySelector(".cash_amount").value,
-                card_amount: card.querySelector(".card_amount").value,
-                discount: card.querySelector(".discount").value,
-                tip: card.querySelector(".tip").value,
-                total: card.querySelector(".car_total").textContent
-            };
+        const mainService = {
+            name: card.querySelector(".service_detail").value,
+            price: Number(card.querySelector(".price").value || 0),
+            points: Number(card.querySelector(".points").value || 0),
+            commission: 0
+        };
 
-            await fetch(API_URL + "/extra-car", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+        services.push(mainService);
+
+        card.querySelectorAll(".service-item").forEach(item => {
+            services.push({
+                name: item.textContent.split("—")[0].trim(),
+                price: Number(item.dataset.price || 0),
+                points: 0,
+                commission: 0
             });
-        }
+        });
+
+        const payload = {
+            membership,
+            plate_numbers: card.querySelector(".plate_numbers").value,
+            plate_letters: card.querySelector(".plate_letters").value,
+            car_type: card.querySelector(".car_type").value,
+            car_model: card.querySelector(".car_model").value,
+            car_size: card.querySelector(".car_size").value,
+            services: JSON.stringify(services),
+            employee_in: card.querySelector(".employee_in").value,
+            branch: card.querySelector(".branch").value,
+            parking_slot: card.querySelector(".parking_slot").value,
+            payment_status: card.querySelector(".payment_status").value,
+            payment_method: card.querySelector(".payment_method").value,
+            cash_amount: card.querySelector(".cash_amount").value,
+            card_amount: card.querySelector(".card_amount").value,
+            discount: card.querySelector(".discount").value,
+            tip: card.querySelector(".tip").value
+        };
+
+        await apiAddVisit(payload);
     }
 
     /* دمج مع submitVisit الأصلي */
     const originalSubmitVisit = window.submitVisit;
 
     window.submitVisit = async function () {
+
+        const membership = document.getElementById("membership").value;
+
         const mainVisitId = await originalSubmitVisit();
 
-        if (!mainVisitId) {
-            showToast("خطأ في تسجيل الزيارة الأساسية");
-            return;
+        const cards = document.querySelectorAll(".car-card");
+
+        for (const card of cards) {
+            await submitSingleCar(card, membership);
         }
 
-        await submitExtraCars(mainVisitId);
-
-        showToast("تم تسجيل جميع السيارات بنجاح");
+        showToast("تم تسجيل جميع السيارات المكتملة");
     };
 
     /* التوست */
