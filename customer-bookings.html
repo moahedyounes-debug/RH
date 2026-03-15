@@ -115,12 +115,34 @@ window.onload = async function(){
 
   box.classList.remove("empty");
 
-  box.innerHTML = bookings.map(b => {
+box.innerHTML = bookings.map(b => {
 
     const service = b[2];
     const date = formatDate(b[3]);
-    const time = formatTime(b[4]);
+
+    let rawTime = b[4];
+
+    // معالجة الوقت لو كان رقم Excel
+    if (!isNaN(rawTime)) {
+      const excelTime = Number(rawTime);
+      const totalMinutes = Math.round(excelTime * 24 * 60);
+      const hh = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+      const mm = String(totalMinutes % 60).padStart(2, "0");
+      rawTime = `${hh}:${mm}`;
+    }
+
+    const time = formatTime(rawTime);
     const status = b[5];
+
+    return `
+      <div class="booking-card">
+        الخدمة: ${service}<br>
+        التاريخ: ${date}<br>
+        الوقت: ${time}<br>
+        الحالة: ${status}
+      </div>
+    `;
+}).join("");
 
     return `
       <div class="booking-card">
