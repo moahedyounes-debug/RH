@@ -491,6 +491,9 @@ document.addEventListener("DOMContentLoaded", () => {
         /* ربط الدفع */
         setupPaymentLogic(card);
 
+        /* ربط حساب الإجمالي */
+        attachTotalEvents(card);
+
         /* إضافة خدمة */
         card.querySelector(".btnAddService").onclick = () => {
             addServiceToExtraCar(card);
@@ -568,6 +571,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 pointsInput.value = row.points;
                 totalSpan.textContent = row.price;
                 card.dataset.price = row.price;
+
+                calculateExtraCarTotal(card);
             }
         };
     }
@@ -641,6 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const div = document.createElement("div");
         div.className = "service-item";
+        div.dataset.price = row.price;
         div.innerHTML = `
             <span>${detailSel.value} — ${row.price} ريال</span>
             <button class="btn-danger small removeService">✕</button>
@@ -648,10 +654,87 @@ document.addEventListener("DOMContentLoaded", () => {
 
         div.querySelector(".removeService").onclick = () => {
             div.remove();
+            calculateExtraCarTotal(card);
         };
 
         list.appendChild(div);
+
+        calculateExtraCarTotal(card);
     }
+
+    /* حساب إجمالي السيارة */
+    function calculateExtraCarTotal(card) {
+        let total = 0;
+
+        total += Number(card.dataset.price || 0);
+
+        card.querySelectorAll(".service-item").forEach(item => {
+            total += Number(item.dataset.price || 0);
+        });
+
+        total -= Number(card.querySelector(".discount").value || 0);
+        total += Number(card.querySelector(".tip").value || 0);
+
+        card.querySelector(".car_total").textContent = total;
+
+        return total;
+    }
+
+    function attachTotalEvents(card) {
+        ["discount", "tip"].forEach(cls => {
+            card.querySelector("." + cls).oninput = () => calculateExtraCarTotal(card);
+        });
+    }
+
+    /* إرسال السيارات الإضافية */
+    async function submitExtraCars(mainVisitId) {
+        const cards = document.querySelectorAll(".car-card");
+
+        for (const card of cards) {
+            const payload = {
+                visit_id: mainVisitId,
+                plate_numbers: card.querySelector(".plate_numbers").value,
+                plate_letters: card.querySelector(".plate_letters").value,
+                car_type: card.querySelector(".car_type").value,
+                car_model: card.querySelector(".car_model").value,
+                car_size: card.querySelector(".car_size").value,
+                service_type: card.querySelector(".service_type").value,
+                service_detail: card.querySelector(".service_detail").value,
+                employee_in: card.querySelector(".employee_in").value,
+                branch: card.querySelector(".branch").value,
+                parking_slot: card.querySelector(".parking_slot").value,
+                payment_status: card.querySelector(".payment_status").value,
+                payment_method: card.querySelector(".payment_method").value,
+                cash_amount: card.querySelector(".cash_amount").value,
+                card_amount: card.querySelector(".card_amount").value,
+                discount: card.querySelector(".discount").value,
+                tip: card.querySelector(".tip").value,
+                total: card.querySelector(".car_total").textContent
+            };
+
+            await fetch(API_URL + "/extra-car", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+        }
+    }
+
+    /* دمج مع submitVisit الأصلي */
+    const originalSubmitVisit = window.submitVisit;
+
+    window.submitVisit = async function () {
+        const mainVisitId = await originalSubmitVisit();
+
+        if (!mainVisitId) {
+            showToast("خطأ في تسجيل الزيارة الأساسية");
+            return;
+        }
+
+        await submitExtraCars(mainVisitId);
+
+        showToast("تم تسجيل جميع السيارات بنجاح");
+    };
 
     /* التوست */
     function showToast(msg) {
