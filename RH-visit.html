@@ -1,802 +1,721 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>رغوة الهجين - إدارة الزيارات</title>
-
-<link rel="stylesheet" href="visit-manager.css">
-<script src="api.js"></script>
-
-<style>
-.row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-.row5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-
-.car-card {
-    border: 2px solid #ddd;
-    padding: 15px;
-    border-radius: 10px;
-    background: #fafafa;
-    margin-top: 25px;
-}
-
-.car-card .btn-remove-car {
-    background: #d9534f;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.car-card .total {
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 15px;
-}
-
-#toast-container {
-    position: fixed;
-    top: 20px;
-    right: 50%;
-    transform: translateX(50%);
-    z-index: 999999;
-}
-
-.toast {
-    background: #ffffff;
-    color: #b30000;
-    border: 2px solid #b30000;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    animation: fadeInOut 3s ease forwards;
-}
-
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-20px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-20px); }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رغوة الهجين - إدارة الزيارات</title>
+  <link rel="stylesheet" href="visit-manager.css">
+  <script src="api.js"></script>
+  <style>
+    .row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+    .row5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+    .car-card {
+      border: 2px solid #ddd;
+      padding: 15px;
+      border-radius: 10px;
+      background: #fafafa;
+      margin-top: 25px;
+    }
+    .car-card .btn-remove-car {
+      background: #d9534f;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .car-card .total {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 50%;
+      transform: translateX(50%);
+      z-index: 999999;
+    }
+    .toast {
+      background: #ffffff;
+      color: #b30000;
+      border: 2px solid #b30000;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: fadeInOut 3s ease forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(-20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+  </style>
 </head>
-
 <body>
-
 <div class="container">
+  <div class="page-header">
+    <h1>رغوة الهجين</h1>
+    <h2>إدارة الزيارات</h2>
+  </div>
 
-<div class="page-header">
-<h1>رغوة الهجين</h1>
-<h2>إدارة الزيارات</h2>
-</div>
+  <div class="summary-bar">
+    <div class="summary-item">
+      <div class="label">الزيارات النشطة</div>
+      <div class="value" id="summaryActive">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">السيارات حالياً</div>
+      <div class="value" id="summaryCars">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">إجمالي المستحق</div>
+      <div class="value" id="summaryTotal">0 ريال</div>
+    </div>
+  </div>
 
-<div class="summary-bar">
-<div class="summary-item">
-<div class="label">الزيارات النشطة</div>
-<div class="value" id="summaryActive">0</div>
-</div>
-<div class="summary-item">
-<div class="label">السيارات حالياً</div>
-<div class="value" id="summaryCars">0</div>
-</div>
-<div class="summary-item">
-<div class="label">إجمالي المستحق</div>
-<div class="value" id="summaryTotal">0 ريال</div>
-</div>
-</div>
+  <div class="section">
+    <h3 class="section-title">🚗 سيارات داخل المغسلة (غير مدفوع)</h3>
+    <div id="activeVisitsList" class="cards">
+      <div class="loading">جارِ التحميل...</div>
+    </div>
+    <button id="btnRefreshActive" class="btn-secondary full">🔄 تحديث القائمة</button>
+  </div>
 
-<div class="section">
-<h3 class="section-title">🚗 سيارات داخل المغسلة (غير مدفوعة)</h3>
-<div id="activeVisitsList" class="cards">
-<div class="loading">جارِ التحميل...</div>
-</div>
-<button id="btnRefreshActive" class="btn-secondary full">🔄 تحديث القائمة</button>
-</div>
+  <!-- السيارة الأساسية -->
+  <div id="visitBox" class="section main-car-card">
+    <h3 class="section-title">📝 تسجيل زيارة جديدة</h3>
 
-<!-- تسجيل الزيارة الأساسية -->
-<div id="visitBox" class="section">
-<h3 class="section-title">📝 تسجيل زيارة جديدة</h3>
-
-<!-- الصف الأول -->
-<div class="row4">
-    <div>
-        <label>أرقام اللوحة *</label>
-        <input type="text" id="plate_numbers" required>
-    </div>
-    <div>
-        <label>حروف اللوحة</label>
-        <input type="text" id="plate_letters">
-    </div>
-    <div>
-        <label>براند السيارة *</label>
-        <select id="car_type" required></select>
-    </div>
-    <div>
-        <label>موديل السيارة *</label>
-        <select id="car_model" required></select>
-    </div>
-</div>
-
-<!-- الصف الثاني -->
-<div class="row4" style="margin-top:15px;">
-    <div>
-        <label>الحجم</label>
-        <input type="text" id="car_size" readonly>
-    </div>
-    <div>
-        <label>نوع الخدمة *</label>
-        <select id="service_type" required></select>
-    </div>
-    <div>
-        <label>تفاصيل الخدمة *</label>
-        <select id="service_detail" required></select>
-    </div>
-    <div>
-        <label>الموظف *</label>
-        <select id="employee_in" required></select>
-    </div>
-</div>
-
-<!-- الصف الثالث -->
-<div class="row5" style="margin-top:15px;">
-    <div>
-        <label>السعر</label>
-        <input type="number" id="price" readonly>
-    </div>
-    <div>
-        <label>النقاط</label>
-        <input type="number" id="points" readonly>
-    </div>
-    <div>
-        <label>الخصم</label>
-        <input type="number" id="discount" value="0">
-    </div>
-    <div>
-        <label>الإكرامية</label>
-        <input type="number" id="tip" value="0">
-    </div>
-    <div>
-        <label>الموقف *</label>
-        <select id="parking_slot" required>
-            <option value="">— اختر —</option>
-            <option>1</option><option>2</option><option>3</option>
-            <option>4</option><option>5</option><option>6</option>
-        </select>
-    </div>
-</div>
-
-<!-- الصف الرابع -->
-<div class="row4" style="margin-top:15px;">
-    <div>
-        <label>الفرع *</label>
-        <select id="branch" required></select>
-    </div>
-    <div>
-        <label>حالة الدفع *</label>
-        <select id="payment_status" required>
-            <option value="">— اختر —</option>
-            <option value="مدفوع">مدفوع</option>
-            <option value="غير مدفوع">غير مدفوع</option>
-        </select>
-    </div>
-    <div id="payment_method_wrapper" style="display:none;">
-        <label>طريقة الدفع *</label>
-        <select id="payment_method">
-            <option value="">— اختر —</option>
-            <option value="كاش">كاش</option>
-            <option value="شبكة">شبكة</option>
-            <option value="جزئي">جزئي</option>
-        </select>
-    </div>
-    <div></div>
-</div>
-
-<!-- الدفع الجزئي -->
-<div id="partial_payment_box" style="display:none; margin-top:15px;">
+    <!-- الصف الأول -->
     <div class="row4">
-        <div>
-            <label>الكاش</label>
-            <input type="number" id="cash_amount" value="0">
-        </div>
-        <div>
-            <label>الشبكة</label>
-            <input type="number" id="card_amount" value="0">
-        </div>
+      <div>
+        <label>أرقام اللوحة *</label>
+        <input type="text" id="plate_numbers" class="plate_numbers" required>
+      </div>
+      <div>
+        <label>حروف اللوحة</label>
+        <input type="text" id="plate_letters" class="plate_letters">
+      </div>
+      <div>
+        <label>براند السيارة *</label>
+        <select id="car_type" class="car_type" required></select>
+      </div>
+      <div>
+        <label>موديل السيارة *</label>
+        <select id="car_model" class="car_model" required></select>
+      </div>
     </div>
-</div>
 
-<!-- زر إضافة خدمة -->
-<button id="btnAddService" class="btn-secondary full">➕ إضافة خدمة</button>
+    <!-- الصف الثاني -->
+    <div class="row4" style="margin-top:15px;">
+      <div>
+        <label>الحجم</label>
+        <input type="text" id="car_size" class="car_size" readonly>
+      </div>
+      <div>
+        <label>نوع الخدمة *</label>
+        <select id="service_type" class="service_type" required></select>
+      </div>
+      <div>
+        <label>تفاصيل الخدمة *</label>
+        <select id="service_detail" class="service_detail" required></select>
+      </div>
+      <div>
+        <label>الموظف *</label>
+        <select id="employee_in" class="employee_in" required></select>
+      </div>
+    </div>
 
-<div id="servicesList"></div>
+    <!-- الصف الثالث -->
+    <div class="row5" style="margin-top:15px;">
+      <div>
+        <label>السعر</label>
+        <input type="number" id="price" class="price" readonly>
+      </div>
+      <div>
+        <label>النقاط</label>
+        <input type="number" id="points" class="points" readonly>
+      </div>
+      <div>
+        <label>الخصم</label>
+        <input type="number" id="discount" class="discount" value="0">
+      </div>
+      <div>
+        <label>الإكرامية</label>
+        <input type="number" id="tip" class="tip" value="0">
+      </div>
+      <div>
+        <label>الموقف *</label>
+        <select id="parking_slot" class="parking_slot" required>
+          <option value="">— اختر —</option>
+          <option>1</option><option>2</option><option>3</option>
+          <option>4</option><option>5</option><option>6</option>
+        </select>
+      </div>
+    </div>
 
-<div class="total">
-    الإجمالي: <span id="totalPrice">0</span> ريال
-</div>
+    <!-- الصف الرابع -->
+    <div class="row4" style="margin-top:15px;">
+      <div>
+        <label>الفرع *</label>
+        <select id="branch" class="branch" required></select>
+      </div>
+      <div>
+        <label>حالة الدفع *</label>
+        <select id="payment_status" class="payment_status" required>
+          <option value="">— اختر —</option>
+          <option value="مدفوع">مدفوع</option>
+          <option value="غير مدفوع">غير مدفوع</option>
+        </select>
+      </div>
+      <div id="payment_method_wrapper" class="payment_method_wrapper" style="display:none;">
+        <label>طريقة الدفع *</label>
+        <select id="payment_method" class="payment_method">
+          <option value="">— اختر —</option>
+          <option value="كاش">كاش</option>
+          <option value="شبكة">شبكة</option>
+          <option value="جزئي">جزئي</option>
+        </select>
+      </div>
+      <div></div>
+    </div>
 
-</div> <!-- نهاية كرت السيارة الأساسية -->
+    <!-- الدفع الجزئي -->
+    <div id="partial_payment_box" class="partial_payment_box" style="display:none; margin-top:15px;">
+      <div class="row4">
+        <div>
+          <label>الكاش</label>
+          <input type="number" id="cash_amount" class="cash_amount" value="0">
+        </div>
+        <div>
+          <label>الشبكة</label>
+          <input type="number" id="card_amount" class="card_amount" value="0">
+        </div>
+      </div>
+    </div>
 
-<!-- زر إضافة سيارة جديدة -->
-<button id="btnAddCar" class="btn-secondary full" style="margin-top:25px;">
+    <!-- زر إضافة خدمة -->
+    <button id="btnAddService" class="btn-secondary full">➕ إضافة خدمة</button>
+    <div id="servicesList" class="servicesList"></div>
+
+    <div class="total">
+      الإجمالي: <span id="totalPrice" class="car_total">0</span> ريال
+    </div>
+  </div> <!-- نهاية السيارة الأساسية -->
+
+  <!-- زر إضافة سيارة جديدة -->
+  <button id="btnAddCar" class="btn-secondary full" style="margin-top:25px;">
     ➕ إضافة سيارة جديدة
-</button>
+  </button>
 
-<!-- هنا 👇 نضع زر تسجيل الزيارة -->
-<button id="btnSubmitVisit" class="btn-primary full" onclick="submitVisit()" style="margin-top:30px;">
+  <!-- حاوية السيارات الإضافية -->
+  <div id="carsContainer"></div>
+
+  <!-- زر تسجيل الزيارة (آخر الصفحة) -->
+  <button id="btnSubmitVisit" class="btn-primary full" onclick="submitVisit()" style="margin-top:30px;">
     💾 تسجيل الزيارة
-</button>
+  </button>
 
-<!-- حاوية السيارات الإضافية -->
-<div id="carsContainer"></div>
+  <!-- قالب سيارة إضافية -->
+  <template id="carCardTemplate">
+    <div class="car-card">
+      <button class="btn-remove-car">🗑 حذف</button>
+      <h3>🚗 سيارة إضافية</h3>
 
-<!-- قالب سيارة إضافية كاملة -->
-<template id="carCardTemplate">
-<div class="car-card">
+      <div class="row4">
+        <div>
+          <label>أرقام اللوحة *</label>
+          <input type="text" class="plate_numbers">
+        </div>
+        <div>
+          <label>حروف اللوحة</label>
+          <input type="text" class="plate_letters">
+        </div>
+        <div>
+          <label>براند السيارة *</label>
+          <select class="car_type"></select>
+        </div>
+        <div>
+          <label>موديل السيارة *</label>
+          <select class="car_model"></select>
+        </div>
+      </div>
 
-<button class="btn-remove-car">🗑 حذف</button>
+      <div class="row4" style="margin-top:15px;">
+        <div>
+          <label>الحجم</label>
+          <input type="text" class="car_size" readonly>
+        </div>
+        <div>
+          <label>نوع الخدمة *</label>
+          <select class="service_type"></select>
+        </div>
+        <div>
+          <label>تفاصيل الخدمة *</label>
+          <select class="service_detail"></select>
+        </div>
+        <div>
+          <label>الموظف *</label>
+          <select class="employee_in"></select>
+        </div>
+      </div>
 
-<h3>🚗 سيارة إضافية</h3>
-
-<!-- نفس النموذج الأساسي لكن classes -->
-<div class="row4">
-    <div>
-        <label>أرقام اللوحة *</label>
-        <input type="text" class="plate_numbers">
-    </div>
-    <div>
-        <label>حروف اللوحة</label>
-        <input type="text" class="plate_letters">
-    </div>
-    <div>
-        <label>براند السيارة *</label>
-        <select class="car_type"></select>
-    </div>
-    <div>
-        <label>موديل السيارة *</label>
-        <select class="car_model"></select>
-    </div>
-</div>
-
-<div class="row4" style="margin-top:15px;">
-    <div>
-        <label>الحجم</label>
-        <input type="text" class="car_size" readonly>
-    </div>
-    <div>
-        <label>نوع الخدمة *</label>
-        <select class="service_type"></select>
-    </div>
-    <div>
-        <label>تفاصيل الخدمة *</label>
-        <select class="service_detail"></select>
-    </div>
-    <div>
-        <label>الموظف *</label>
-        <select class="employee_in"></select>
-    </div>
-</div>
-
-<div class="row5" style="margin-top:15px;">
-    <div>
-        <label>السعر</label>
-        <input type="number" class="price" readonly>
-    </div>
-    <div>
-        <label>النقاط</label>
-        <input type="number" class="points" readonly>
-    </div>
-    <div>
-        <label>الخصم</label>
-        <input type="number" class="discount" value="0">
-    </div>
-    <div>
-        <label>الإكرامية</label>
-        <input type="number" class="tip" value="0">
-    </div>
-    <div>
-        <label>الموقف *</label>
-        <select class="parking_slot">
+      <div class="row5" style="margin-top:15px;">
+        <div>
+          <label>السعر</label>
+          <input type="number" class="price" readonly>
+        </div>
+        <div>
+          <label>النقاط</label>
+          <input type="number" class="points" readonly>
+        </div>
+        <div>
+          <label>الخصم</label>
+          <input type="number" class="discount" value="0">
+        </div>
+        <div>
+          <label>الإكرامية</label>
+          <input type="number" class="tip" value="0">
+        </div>
+        <div>
+          <label>الموقف *</label>
+          <select class="parking_slot">
             <option value="">— اختر —</option>
             <option>1</option><option>2</option><option>3</option>
             <option>4</option><option>5</option><option>6</option>
-        </select>
-    </div>
-</div>
+          </select>
+        </div>
+      </div>
 
-<div class="row4" style="margin-top:15px;">
-    <div>
-        <label>الفرع *</label>
-        <select class="branch"></select>
-    </div>
-    <div>
-        <label>حالة الدفع *</label>
-        <select class="payment_status">
+      <div class="row4" style="margin-top:15px;">
+        <div>
+          <label>الفرع *</label>
+          <select class="branch"></select>
+        </div>
+        <div>
+          <label>حالة الدفع *</label>
+          <select class="payment_status">
             <option value="">— اختر —</option>
             <option value="مدفوع">مدفوع</option>
             <option value="غير مدفوع">غير مدفوع</option>
-        </select>
-    </div>
-    <div class="payment_method_wrapper" style="display:none;">
-        <label>طريقة الدفع *</label>
-        <select class="payment_method">
+          </select>
+        </div>
+        <div class="payment_method_wrapper" style="display:none;">
+          <label>طريقة الدفع *</label>
+          <select class="payment_method">
             <option value="">— اختر —</option>
             <option value="كاش">كاش</option>
             <option value="شبكة">شبكة</option>
             <option value="جزئي">جزئي</option>
-        </select>
-    </div>
-    <div></div>
-</div>
+          </select>
+        </div>
+        <div></div>
+      </div>
 
-<div class="partial_payment_box" style="display:none; margin-top:15px;">
-    <div class="row4">
-        <div>
+      <div class="partial_payment_box" style="display:none; margin-top:15px;">
+        <div class="row4">
+          <div>
             <label>الكاش</label>
             <input type="number" class="cash_amount" value="0">
-        </div>
-        <div>
+          </div>
+          <div>
             <label>الشبكة</label>
             <input type="number" class="card_amount" value="0">
+          </div>
         </div>
+      </div>
+
+      <button class="btnAddService btn-secondary full">➕ إضافة خدمة</button>
+      <div class="servicesList"></div>
+      <div class="total">الإجمالي: <span class="car_total">0</span> ريال</div>
     </div>
+  </template>
+
+  <!-- مودال الدفع -->
+  <div id="paymentModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>💳 تحديث الدفع</h3>
+        <button id="closePaymentModal" class="btn-danger small">✕</button>
+      </div>
+      <label>طريقة الدفع</label>
+      <select id="modal_method_select">
+        <option value="كاش">كاش</option>
+        <option value="شبكة">شبكة</option>
+        <option value="جزئي">جزئي (كاش + شبكة)</option>
+      </select>
+      <p><b>الإجمالي قبل الخصم:</b> <span id="modal_total_before">0 ريال</span></p>
+      <div style="margin-top:15px;">
+        <label>الخصم</label>
+        <input type="number" id="modal_discount_input" placeholder="0">
+      </div>
+      <p><b>الخصم الحالي:</b> <span id="modal_discount">0 ريال</span></p>
+      <p><b>الإجمالي بعد الخصم:</b> <span id="modal_total_after">0 ريال</span></p>
+      <div style="margin-top:15px;">
+        <label>الإكرامية</label>
+        <input type="number" id="modal_tip_input" placeholder="0">
+      </div>
+      <p><b>الإكرامية الحالية:</b> <span id="modal_tip">0 ريال</span></p>
+      <div id="cash_box" style="display:none; margin-top:15px;">
+        <label>مبلغ الكاش</label>
+        <input type="number" id="modal_cash" placeholder="0">
+      </div>
+      <div id="card_box" style="display:none; margin-top:15px;">
+        <label>مبلغ الشبكة</label>
+        <input type="number" id="modal_card" placeholder="0">
+      </div>
+      <div class="modal-actions">
+        <button id="modal_confirm" class="btn-primary">✅ تأكيد</button>
+        <button id="modal_close" class="btn-secondary">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- مودال التعديل -->
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h3>✏️ تعديل الزيارة</h3>
+        <button id="editClose" class="btn-danger small">✕</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-swap">🔄 تبديل خدمة</button>
+        <button class="tab-btn" data-tab="tab-delete">🗑️ حذف خدمة</button>
+        <button class="tab-btn" data-tab="tab-add">➕ إضافة خدمة</button>
+        <button class="tab-btn" data-tab="tab-emp">👤 تغيير الموظف</button>
+        <button class="tab-btn" data-tab="tab-disc">💰 تغيير الخصم</button>
+        <button class="tab-btn" data-tab="tab-tip">🎁 تغيير الإكرامية</button>
+      </div>
+      <div class="tab-content">
+        <div id="tab-swap" class="tab-pane">
+          <label>اختر الخدمة الحالية</label>
+          <select id="swapOldServiceSelect"></select>
+          <label style="margin-top:15px;">اختر الخدمة الجديدة</label>
+          <select id="swapNewServiceSelect"></select>
+          <button id="swapConfirm" class="btn-primary full">تأكيد التبديل</button>
+        </div>
+        <div id="tab-delete" class="tab-pane">
+          <label>اختر الخدمة المراد حذفها</label>
+          <select id="deleteServiceSelect"></select>
+          <button id="deleteConfirm" class="btn-danger full">حذف الخدمة</button>
+        </div>
+        <div id="tab-add" class="tab-pane">
+          <label>اختر خدمة للإضافة</label>
+          <select id="addServiceSelect"></select>
+          <button id="addConfirm" class="btn-primary full">إضافة الخدمة</button>
+        </div>
+        <div id="tab-emp" class="tab-pane">
+          <label>اختر الموظف الجديد</label>
+          <select id="empSelect"></select>
+          <button id="empConfirm" class="btn-primary full">تحديث الموظف</button>
+        </div>
+        <div id="tab-disc" class="tab-pane">
+          <label>الخصم الجديد</label>
+          <input type="number" id="discInput" placeholder="0">
+          <button id="discConfirm" class="btn-primary full">تحديث الخصم</button>
+        </div>
+        <div id="tab-tip" class="tab-pane">
+          <label>الإكرامية الجديدة</label>
+          <input type="number" id="tipInput" placeholder="0">
+          <button id="tipConfirm" class="btn-primary full">تحديث الإكرامية</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
 </div>
-
-<button class="btnAddService btn-secondary full">➕ إضافة خدمة</button>
-
-<div class="servicesList"></div>
-
-<div class="total">الإجمالي: <span class="car_total">0</span> ريال</div>
-
-</div>
-</template>
-<!-- مودال الدفع -->
-<div id="paymentModal" class="modal-overlay">
-<div class="modal-box">
-<div class="modal-header">
-<h3>💳 تحديث الدفع</h3>
-<button id="closePaymentModal" class="btn-danger small">✕</button>
-</div>
-
-<label>طريقة الدفع</label>
-<select id="modal_method_select">
-<option value="كاش">كاش</option>
-<option value="شبكة">شبكة</option>
-<option value="جزئي">جزئي (كاش + شبكة)</option>
-</select>
-
-<p><b>الإجمالي قبل الخصم:</b> <span id="modal_total_before">0 ريال</span></p>
-
-<div style="margin-top:15px;">
-<label>الخصم</label>
-<input type="number" id="modal_discount_input" placeholder="0">
-</div>
-
-<p><b>الخصم الحالي:</b> <span id="modal_discount">0 ريال</span></p>
-<p><b>الإجمالي بعد الخصم:</b> <span id="modal_total_after">0 ريال</span></p>
-
-<div style="margin-top:15px;">
-<label>الإكرامية</label>
-<input type="number" id="modal_tip_input" placeholder="0">
-</div>
-
-<p><b>الإكرامية الحالية:</b> <span id="modal_tip">0 ريال</span></p>
-
-<div id="cash_box" style="display:none; margin-top:15px;">
-<label>مبلغ الكاش</label>
-<input type="number" id="modal_cash" placeholder="0">
-</div>
-
-<div id="card_box" style="display:none; margin-top:15px;">
-<label>مبلغ الشبكة</label>
-<input type="number" id="modal_card" placeholder="0">
-</div>
-
-<div class="modal-actions">
-<button id="modal_confirm" class="btn-primary">✅ تأكيد</button>
-<button id="modal_close" class="btn-secondary">إغلاق</button>
-</div>
-
-</div>
-</div>
-
-<!-- مودال التعديل -->
-<div id="editModal" class="modal-overlay">
-<div class="modal-box large">
-
-<div class="modal-header">
-<h3>✏️ تعديل الزيارة</h3>
-<button id="editClose" class="btn-danger small">✕</button>
-</div>
-
-<div class="tabs">
-<button class="tab-btn active" data-tab="tab-swap">🔄 تبديل خدمة</button>
-<button class="tab-btn" data-tab="tab-delete">🗑️ حذف خدمة</button>
-<button class="tab-btn" data-tab="tab-add">➕ إضافة خدمة</button>
-<button class="tab-btn" data-tab="tab-emp">👤 تغيير الموظف</button>
-<button class="tab-btn" data-tab="tab-disc">💰 تغيير الخصم</button>
-<button class="tab-btn" data-tab="tab-tip">🎁 تغيير الإكرامية</button>
-</div>
-
-<div class="tab-content">
-
-<div id="tab-swap" class="tab-pane">
-<label>اختر الخدمة الحالية</label>
-<select id="swapOldServiceSelect"></select>
-
-<label style="margin-top:15px;">اختر الخدمة الجديدة</label>
-<select id="swapNewServiceSelect"></select>
-
-<button id="swapConfirm" class="btn-primary full">تأكيد التبديل</button>
-</div>
-
-<div id="tab-delete" class="tab-pane">
-<label>اختر الخدمة المراد حذفها</label>
-<select id="deleteServiceSelect"></select>
-<button id="deleteConfirm" class="btn-danger full">حذف الخدمة</button>
-</div>
-
-<div id="tab-add" class="tab-pane">
-<label>اختر خدمة للإضافة</label>
-<select id="addServiceSelect"></select>
-<button id="addConfirm" class="btn-primary full">إضافة الخدمة</button>
-</div>
-
-<div id="tab-emp" class="tab-pane">
-<label>اختر الموظف الجديد</label>
-<select id="empSelect"></select>
-<button id="empConfirm" class="btn-primary full">تحديث الموظف</button>
-</div>
-
-<div id="tab-disc" class="tab-pane">
-<label>الخصم الجديد</label>
-<input type="number" id="discInput" placeholder="0">
-<button id="discConfirm" class="btn-primary full">تحديث الخصم</button>
-</div>
-
-<div id="tab-tip" class="tab-pane">
-<label>الإكرامية الجديدة</label>
-<input type="number" id="tipInput" placeholder="0">
-<button id="tipConfirm" class="btn-primary full">تحديث الإكرامية</button>
-</div>
-
-</div>
-</div>
-</div>
-
-<div id="toast-container"></div>
 
 <script src="visit-manager.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  const btnAddCar = document.getElementById("btnAddCar");
+  const carsContainer = document.getElementById("carsContainer");
+  const template = document.getElementById("carCardTemplate");
 
-    const btnAddCar = document.getElementById("btnAddCar");
-    const carsContainer = document.getElementById("carsContainer");
-    const template = document.getElementById("carCardTemplate");
+  /* إضافة سيارة جديدة */
+  btnAddCar.onclick = () => {
+    const clone = template.content.cloneNode(true);
+    const card = clone.querySelector(".car-card");
 
-    /* إضافة سيارة جديدة */
-    btnAddCar.onclick = () => {
-        const clone = template.content.cloneNode(true);
-        const card = clone.querySelector(".car-card");
+    card.querySelector(".btn-remove-car").onclick = () => card.remove();
 
-        /* حذف السيارة */
-        card.querySelector(".btn-remove-car").onclick = () => card.remove();
+    loadCarTypesIntoCard(card);
+    loadServicesIntoCard(card);
+    loadEmployeesIntoCard(card);
+    loadBranchesIntoCard(card);
+    setupPaymentLogic(card);
+    attachTotalEvents(card);
+    card.querySelector(".btnAddService").onclick = () => addServiceToExtraCar(card);
 
-        /* تحميل البيانات */
-        loadCarTypesIntoCard(card);
-        loadServicesIntoCard(card);
-        loadEmployeesIntoCard(card);
-        loadBranchesIntoCard(card);
+    carsContainer.appendChild(card);
+  };
 
-        /* ربط الدفع */
-        setupPaymentLogic(card);
+  function isCarValid(card) {
+    const required = [
+      ".plate_numbers",
+      ".car_type",
+      ".car_model",
+      ".service_type",
+      ".service_detail",
+      ".employee_in",
+      ".branch",
+      ".parking_slot"
+    ];
+    for (const sel of required) {
+      const el = card.querySelector(sel);
+      if (!el || !el.value || el.value.trim() === "") return false;
+    }
+    return true;
+  }
 
-        /* ربط حساب الإجمالي */
-        attachTotalEvents(card);
+  function loadCarTypesIntoCard(card) {
+    const brandSel = card.querySelector(".car_type");
+    const modelSel = card.querySelector(".car_model");
+    const sizeInput = card.querySelector(".car_size");
 
-        /* إضافة خدمة */
-        card.querySelector(".btnAddService").onclick = () => addServiceToExtraCar(card);
+    brandSel.innerHTML = '<option value="">— اختر —</option>';
+    modelSel.innerHTML = '<option value="">— اختر —</option>';
 
-        carsContainer.appendChild(card);
+    carTypesData.forEach(r => {
+      if (!brandSel.querySelector(`option[value="${r[0]}"]`)) {
+        const opt = document.createElement("option");
+        opt.value = r[0];
+        opt.textContent = r[0];
+        brandSel.appendChild(opt);
+      }
+    });
+
+    brandSel.onchange = () => {
+      modelSel.innerHTML = '<option value="">— اختر —</option>';
+      const models = carTypesData.filter(x => x[0] === brandSel.value);
+      [...new Set(models.map(x => x[1]))].forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        modelSel.appendChild(opt);
+      });
     };
 
-    /* فحص جاهزية السيارة */
-    function isCarValid(card) {
-        const required = [
-            ".plate_numbers",
-            ".car_type",
-            ".car_model",
-            ".service_type",
-            ".service_detail",
-            ".employee_in",
-            ".branch",
-            ".parking_slot"
-        ];
+    modelSel.onchange = () => {
+      const row = carTypesData.find(
+        x => x[0] === brandSel.value && x[1] === modelSel.value
+      );
+      sizeInput.value = row ? row[2] : "";
+    };
+  }
 
-        for (const sel of required) {
-            const el = card.querySelector(sel);
-            if (!el || !el.value || el.value.trim() === "") {
-                return false;
-            }
-        }
+  function loadServicesIntoCard(card) {
+    const typeSel = card.querySelector(".service_type");
+    const detailSel = card.querySelector(".service_detail");
+    const priceInput = card.querySelector(".price");
+    const pointsInput = card.querySelector(".points");
+    const totalSpan = card.querySelector(".car_total");
 
-        return true;
-    }
+    typeSel.innerHTML = '<option value="">— اختر —</option>';
+    detailSel.innerHTML = '<option value="">— اختر —</option>';
 
-    /* تحميل البراند والموديل */
-    function loadCarTypesIntoCard(card) {
-        const brandSel = card.querySelector(".car_type");
-        const modelSel = card.querySelector(".car_model");
-        const sizeInput = card.querySelector(".car_size");
+    [...new Set(servicesData.map(s => s.category))].forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      typeSel.appendChild(opt);
+    });
 
-        brandSel.innerHTML = '<option value="">— اختر —</option>';
-        modelSel.innerHTML = '<option value="">— اختر —</option>';
-
-        carTypesData.forEach(r => {
-            if (!brandSel.querySelector(`option[value="${r[0]}"]`)) {
-                const opt = document.createElement("option");
-                opt.value = r[0];
-                opt.textContent = r[0];
-                brandSel.appendChild(opt);
-            }
+    typeSel.onchange = () => {
+      detailSel.innerHTML = '<option value="">— اختر —</option>';
+      servicesData
+        .filter(s => s.category === typeSel.value)
+        .forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.service;
+          opt.textContent = s.service;
+          detailSel.appendChild(opt);
         });
+    };
 
-        brandSel.onchange = () => {
-            modelSel.innerHTML = '<option value="">— اختر —</option>';
-            const models = carTypesData.filter(x => x[0] === brandSel.value);
-            [...new Set(models.map(x => x[1]))].forEach(m => {
-                const opt = document.createElement("option");
-                opt.value = m;
-                opt.textContent = m;
-                modelSel.appendChild(opt);
-            });
-        };
-
-        modelSel.onchange = () => {
-            const row = carTypesData.find(
-                x => x[0] === brandSel.value && x[1] === modelSel.value
-            );
-            sizeInput.value = row ? row[2] : "";
-        };
-    }
-
-    /* تحميل الخدمات */
-    function loadServicesIntoCard(card) {
-        const typeSel = card.querySelector(".service_type");
-        const detailSel = card.querySelector(".service_detail");
-        const priceInput = card.querySelector(".price");
-        const pointsInput = card.querySelector(".points");
-        const totalSpan = card.querySelector(".car_total");
-
-        typeSel.innerHTML = '<option value="">— اختر —</option>';
-        detailSel.innerHTML = '<option value="">— اختر —</option>';
-
-        [...new Set(servicesData.map(s => s.category))].forEach(c => {
-            const opt = document.createElement("option");
-            opt.value = c;
-            opt.textContent = c;
-            typeSel.appendChild(opt);
-        });
-
-        typeSel.onchange = () => {
-            detailSel.innerHTML = '<option value="">— اختر —</option>';
-            servicesData
-                .filter(s => s.category === typeSel.value)
-                .forEach(s => {
-                    const opt = document.createElement("option");
-                    opt.value = s.service;
-                    opt.textContent = s.service;
-                    detailSel.appendChild(opt);
-                });
-        };
-
-        detailSel.onchange = () => {
-            const row = servicesData.find(
-                s => s.category === typeSel.value && s.service === detailSel.value
-            );
-
-            if (row) {
-                priceInput.value = row.price ?? 0;
-                pointsInput.value = row.points ?? 0;
-                totalSpan.textContent = row.price ?? 0;
-                card.dataset.price = row.price ?? 0;
-
-                calculateExtraCarTotal(card);
-            }
-        };
-    }
-
-    /* تحميل الموظفين */
-    function loadEmployeesIntoCard(card) {
-        const mainEmp = document.getElementById("employee_in");
-        const sel = card.querySelector(".employee_in");
-        sel.innerHTML = mainEmp.innerHTML;
-    }
-
-    /* تحميل الفروع */
-    function loadBranchesIntoCard(card) {
-        const mainBranch = document.getElementById("branch");
-        const sel = card.querySelector(".branch");
-
-        sel.innerHTML = mainBranch.innerHTML;
-
-        if (sel.querySelector('option[value="مكة"]')) {
-            sel.value = "مكة";
-        } else {
-            sel.selectedIndex = 1;
-        }
-    }
-
-    /* منطق الدفع */
-    function setupPaymentLogic(card) {
-        const statusSel = card.querySelector(".payment_status");
-        const methodWrap = card.querySelector(".payment_method_wrapper");
-        const methodSel = card.querySelector(".payment_method");
-        const partialBox = card.querySelector(".partial_payment_box");
-
-        statusSel.onchange = () => {
-            if (statusSel.value === "مدفوع") {
-                methodWrap.style.display = "block";
-            } else {
-                methodWrap.style.display = "none";
-                partialBox.style.display = "none";
-                methodSel.value = "";
-            }
-        };
-
-        methodSel.onchange = () => {
-            if (methodSel.value === "جزئي") {
-                partialBox.style.display = "block";
-            } else {
-                partialBox.style.display = "none";
-            }
-        };
-    }
-
-    /* إضافة خدمة */
-    function addServiceToExtraCar(card) {
-        const list = card.querySelector(".servicesList");
-        const typeSel = card.querySelector(".service_type");
-        const detailSel = card.querySelector(".service_detail");
-
-        if (!typeSel.value || !detailSel.value) {
-            showToast("اختر الخدمة أولاً");
-            return;
-        }
-
-        const row = servicesData.find(
-            s => s.category === typeSel.value && s.service === detailSel.value
-        );
-
-        const div = document.createElement("div");
-        div.className = "service-item";
-        div.dataset.price = row.price ?? 0;
-        div.innerHTML = `
-            <span>${detailSel.value} — ${row.price ?? 0} ريال</span>
-            <button class="btn-danger small removeService">✕</button>
-        `;
-
-        div.querySelector(".removeService").onclick = () => {
-            div.remove();
-            calculateExtraCarTotal(card);
-        };
-
-        list.appendChild(div);
-
+    detailSel.onchange = () => {
+      const row = servicesData.find(
+        s => s.category === typeSel.value && s.service === detailSel.value
+      );
+      if (row) {
+        priceInput.value = row.price ?? 0;
+        pointsInput.value = row.points ?? 0;
+        totalSpan.textContent = row.price ?? 0;
+        card.dataset.price = row.price ?? 0;
         calculateExtraCarTotal(card);
+      }
+    };
+  }
+
+  function loadEmployeesIntoCard(card) {
+    const mainEmp = document.getElementById("employee_in");
+    const sel = card.querySelector(".employee_in");
+    sel.innerHTML = mainEmp.innerHTML;
+  }
+
+  function loadBranchesIntoCard(card) {
+    const mainBranch = document.getElementById("branch");
+    const sel = card.querySelector(".branch");
+    sel.innerHTML = mainBranch.innerHTML;
+    if (sel.querySelector('option[value="مكة"]')) {
+      sel.value = "مكة";
+    } else {
+      sel.selectedIndex = 1;
+    }
+  }
+
+  function setupPaymentLogic(card) {
+    const statusSel = card.querySelector(".payment_status");
+    const methodWrap = card.querySelector(".payment_method_wrapper");
+    const methodSel = card.querySelector(".payment_method");
+    const partialBox = card.querySelector(".partial_payment_box");
+
+    statusSel.onchange = () => {
+      if (statusSel.value === "مدفوع") {
+        methodWrap.style.display = "block";
+      } else {
+        methodWrap.style.display = "none";
+        partialBox.style.display = "none";
+        methodSel.value = "";
+      }
+    };
+
+    methodSel.onchange = () => {
+      if (methodSel.value === "جزئي") {
+        partialBox.style.display = "block";
+      } else {
+        partialBox.style.display = "none";
+      }
+    };
+  }
+
+  function addServiceToExtraCar(card) {
+    const list = card.querySelector(".servicesList");
+    const typeSel = card.querySelector(".service_type");
+    const detailSel = card.querySelector(".service_detail");
+
+    if (!typeSel.value || !detailSel.value) {
+      showToast("اختر الخدمة أولاً");
+      return;
     }
 
-    /* حساب الإجمالي */
-    function calculateExtraCarTotal(card) {
-        let total = 0;
+    const row = servicesData.find(
+      s => s.category === typeSel.value && s.service === detailSel.value
+    );
 
-        total += Number(card.dataset.price || 0);
+    const div = document.createElement("div");
+    div.className = "service-item";
+    div.dataset.price = row.price ?? 0;
+    div.innerHTML = `
+      <span>${detailSel.value} — ${row.price ?? 0} ريال</span>
+      <button class="btn-danger small removeService">✕</button>
+    `;
+    div.querySelector(".removeService").onclick = () => {
+      div.remove();
+      calculateExtraCarTotal(card);
+    };
 
-        card.querySelectorAll(".service-item").forEach(item => {
-            total += Number(item.dataset.price || 0);
-        });
+    list.appendChild(div);
+    calculateExtraCarTotal(card);
+  }
 
-        total -= Number(card.querySelector(".discount").value || 0);
-        total += Number(card.querySelector(".tip").value || 0);
+  function calculateExtraCarTotal(card) {
+    let total = 0;
+    total += Number(card.dataset.price || 0);
+    card.querySelectorAll(".service-item").forEach(item => {
+      total += Number(item.dataset.price || 0);
+    });
+    total -= Number(card.querySelector(".discount").value || 0);
+    total += Number(card.querySelector(".tip").value || 0);
+    card.querySelector(".car_total").textContent = total;
+    return total;
+  }
 
-        card.querySelector(".car_total").textContent = total;
+  function attachTotalEvents(card) {
+    ["discount", "tip"].forEach(cls => {
+      card.querySelector("." + cls).oninput = () => calculateExtraCarTotal(card);
+    });
+  }
 
-        return total;
-    }
+  async function submitSingleCar(card, membership) {
+    if (!isCarValid(card)) return;
 
-    function attachTotalEvents(card) {
-        ["discount", "tip"].forEach(cls => {
-            card.querySelector("." + cls).oninput = () => calculateExtraCarTotal(card);
-        });
-    }
+    const services = [];
+    const mainService = {
+      name: card.querySelector(".service_detail").value,
+      price: Number(card.querySelector(".price").value || 0),
+      points: Number(card.querySelector(".points").value || 0),
+      commission: 0
+    };
+    services.push(mainService);
 
-    /* إرسال سيارة واحدة */
-    async function submitSingleCar(card, membership) {
+    card.querySelectorAll(".service-item").forEach(item => {
+      services.push({
+        name: item.textContent.split("—")[0].trim(),
+        price: Number(item.dataset.price || 0),
+        points: 0,
+        commission: 0
+      });
+    });
 
-        if (!isCarValid(card)) return;
+    const payload = {
+      membership,
+      plate_numbers: card.querySelector(".plate_numbers").value,
+      plate_letters: card.querySelector(".plate_letters").value,
+      car_type: card.querySelector(".car_type").value,
+      car_model: card.querySelector(".car_model").value,
+      car_size: card.querySelector(".car_size").value,
+      services: JSON.stringify(services),
+      employee_in: card.querySelector(".employee_in").value,
+      branch: card.querySelector(".branch").value,
+      parking_slot: card.querySelector(".parking_slot").value,
+      payment_status: card.querySelector(".payment_status").value,
+      payment_method: card.querySelector(".payment_method").value,
+      cash_amount: card.querySelector(".cash_amount").value,
+      card_amount: card.querySelector(".card_amount").value,
+      discount: card.querySelector(".discount").value,
+      tip: card.querySelector(".tip").value
+    };
 
-        const services = [];
+    await apiAddVisit(payload);
+  }
 
-        const mainService = {
-            name: card.querySelector(".service_detail").value,
-            price: Number(card.querySelector(".price").value || 0),
-            points: Number(card.querySelector(".points").value || 0),
-            commission: 0
-        };
-
-        services.push(mainService);
-
-        card.querySelectorAll(".service-item").forEach(item => {
-            services.push({
-                name: item.textContent.split("—")[0].trim(),
-                price: Number(item.dataset.price || 0),
-                points: 0,
-                commission: 0
-            });
-        });
-
-        const payload = {
-            membership,
-            plate_numbers: card.querySelector(".plate_numbers").value,
-            plate_letters: card.querySelector(".plate_letters").value,
-            car_type: card.querySelector(".car_type").value,
-            car_model: card.querySelector(".car_model").value,
-            car_size: card.querySelector(".car_size").value,
-            services: JSON.stringify(services),
-            employee_in: card.querySelector(".employee_in").value,
-            branch: card.querySelector(".branch").value,
-            parking_slot: card.querySelector(".parking_slot").value,
-            payment_status: card.querySelector(".payment_status").value,
-            payment_method: card.querySelector(".payment_method").value,
-            cash_amount: card.querySelector(".cash_amount").value,
-            card_amount: card.querySelector(".card_amount").value,
-            discount: card.querySelector(".discount").value,
-            tip: card.querySelector(".tip").value
-        };
-
-        await apiAddVisit(payload);
-    }
-
-    /* دمج مع submitVisit الأصلي */
-    const originalSubmitVisit = window.submitVisit;
-
-window.submitVisit = async function () {
-
+  window.submitVisit = async function () {
     const mainCard = document.querySelector(".main-car-card");
-
     if (!mainCard) {
-        showToast("لا يوجد سيارة رئيسية");
-        return;
+      showToast("لا يوجد سيارة رئيسية");
+      return;
     }
 
-    const membership = document.getElementById("membership").value;
+    const membershipInput = document.getElementById("membership");
+    const membership = membershipInput ? membershipInput.value : "";
 
-    // إرسال السيارة الأساسية
     await submitSingleCar(mainCard, membership);
 
-    // إرسال السيارات الإضافية
-    const cards = document.querySelectorAll(".car-card");
-
+    const cards = document.querySelectorAll(".car-card:not(.main-car-card)");
     for (const card of cards) {
-        await submitSingleCar(card, membership);
+      await submitSingleCar(card, membership);
     }
 
     showToast("تم تسجيل جميع السيارات المكتملة");
-};
+  };
 
-    /* التوست */
-    function showToast(msg) {
-        const box = document.getElementById("toast-container");
-        const t = document.createElement("div");
-        t.className = "toast";
-        t.textContent = msg;
-        box.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    }
-
+  function showToast(msg) {
+    const box = document.getElementById("toast-container");
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
 });
 </script>
+</body>
+</html>
