@@ -1,32 +1,64 @@
 /* =============================
    تنسيق التاريخ (Excel + نص + ISO)
 ============================= */
-function formatTimeSmart(value) {
-  if (!value) return "";
+function formatDateTime(valueDate, valueTime) {
+  let finalDate = "";
+  let finalTime = "";
+  let finalDay  = "";
 
-  // لو نص جاهز HH:MM
-  if (typeof value === "string" && value.includes(":")) {
-    return value.slice(0, 5);
-  }
-
-  // لو رقم Excel
-  if (!isNaN(value)) {
-    const excelTime = Number(value);
-
-    // تجاهل القيم الغلط مثل -1899 أو 1899 أو أي رقم خارج نطاق الوقت
-    if (excelTime <= 0 || excelTime >= 1) {
-      return ""; // لا نعرض وقت خاطئ
+  /* =============================
+     معالجة التاريخ
+  ============================== */
+  if (valueDate) {
+    if (isNaN(valueDate)) {
+      const d = new Date(valueDate);
+      if (!isNaN(d)) {
+        finalDay = d.toLocaleDateString("ar-SA", { weekday: "long" });
+        const month = d.toLocaleString("en-US", { month: "short" });
+        const day = String(d.getDate()).padStart(2, "0");
+        const year = d.getFullYear();
+        finalDate = `${month}/${day}/${year}`;
+      }
+    } else {
+      const excelDate = Number(valueDate);
+      if (excelDate > 0) {
+        const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+        if (!isNaN(jsDate)) {
+          finalDay = jsDate.toLocaleDateString("ar-SA", { weekday: "long" });
+          const month = jsDate.toLocaleString("en-US", { month: "short" });
+          const day = String(jsDate.getDate()).padStart(2, "0");
+          const year = jsDate.getFullYear();
+          finalDate = `${month}/${day}/${year}`;
+        }
+      }
     }
-
-    const totalMinutes = Math.round(excelTime * 24 * 60);
-    const hh = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
-    const mm = String(totalMinutes % 60).padStart(2, "0");
-    return `${hh}:${mm}`;
   }
 
-  return "";
-}
+  /* =============================
+     معالجة الوقت
+  ============================== */
+  if (valueTime) {
+    if (typeof valueTime === "string" && valueTime.includes(":")) {
+      finalTime = valueTime.slice(0, 5);
+    } else if (!isNaN(valueTime)) {
+      const excelTime = Number(valueTime);
 
+      // تجاهل القيم الغلط مثل -1899 أو 1899
+      if (excelTime > 0 && excelTime < 1) {
+        const totalMinutes = Math.round(excelTime * 24 * 60);
+        const hh = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+        const mm = String(totalMinutes % 60).padStart(2, "0");
+        finalTime = `${hh}:${mm}`;
+      }
+    }
+  }
+
+  return {
+    day: finalDay,
+    date: finalDate,
+    time: finalTime
+  };
+}
 /* =============================
    تحميل بيانات العميل
 ============================= */
@@ -200,24 +232,24 @@ async function loadBookings(){
     return;
   }
 
-  // تحويل البيانات
   const bookings = res.bookings.map(b => b.data);
 
-  // ترتيب الحجوزات حسب التاريخ والوقت
   bookings.sort((a, b) => {
     const dateA = new Date(a[3] + " " + a[4]);
     const dateB = new Date(b[3] + " " + b[4]);
-    return dateB - dateA; // الأحدث أولاً
+    return dateB - dateA;
   });
 
   const last = bookings[0];
 
   const service = last[2];
-  const date = formatDateSmart(last[3]);
-  const time = formatTimeSmart(last[4]);
 
-  // استخراج اليوم
-  const dayName = new Date(last[3]).toLocaleDateString("ar-SA", { weekday: "long" });
+  // استخدام الدالة الموحدة
+  const dt = formatDateTime(last[3], last[4]);
+
+  const day  = dt.day;
+  const date = dt.date;
+  const time = dt.time;
 
   box.classList.remove("empty");
 
@@ -225,7 +257,7 @@ async function loadBookings(){
     <div style="font-size:14px;margin-bottom:6px;">${bookings.length} حجز</div>
 
     <div style="font-size:14px;">
-      <b>${dayName}</b><br>
+      <b>${day}</b><br>
       التاريخ: ${date}<br>
       الوقت: ${time}<br>
       الخدمة: ${service}
