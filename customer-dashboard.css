@@ -1,0 +1,162 @@
+body{
+  font-family:"Tajawal",sans-serif;
+  background:#F4FAFF;
+  color:#0D47A1;
+  padding:16px;
+}
+
+.logo{
+  width:140px;
+  display:block;
+  margin:0 auto 10px auto;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:6px;
+  font-size:24px;
+  font-weight:700;
+  color:#0D47A1;
+}
+
+.subtitle{
+  text-align:center;
+  color:#4FC3F7;
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.section{
+  background:#FFFFFF;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  border:1px solid #E3F2FD;
+}
+
+.title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#0D47A1;
+}
+
+.sub{
+  font-size:13px;
+  color:#4FC3F7;
+  margin-bottom:12px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:6px;
+  font-size:15px;
+}
+
+.label{
+  color:#4FC3F7;
+}
+
+.value{
+  color:#0D47A1;
+  font-weight:600;
+}
+
+.btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:999px;
+  background:#0D47A1;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.btn-outline{
+  background:transparent;
+  border:2px solid #0D47A1;
+  color:#0D47A1;
+}
+
+.car-card{
+  background:#F0F7FF;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid #DCEBFF;
+}
+
+.car-img{
+  width:55px;
+  height:55px;
+  border-radius:10px;
+  background:#0D47A1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  color:white;
+}
+
+.car-info div{
+  font-size:14px;
+  margin-bottom:2px;
+  color:#0D47A1;
+}
+
+.empty{
+  font-size:14px;
+  color:#4FC3F7;
+}
+
+.logout{
+  text-align:center;
+  margin-top:10px;
+  font-size:14px;
+  color:#D32F2F;
+  cursor:pointer;
+}
+
+.progress-box{
+  background:#E3F2FD;
+  border-radius:999px;
+  height:10px;
+  margin-top:8px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:#4FC3F7;
+  width:0%;
+  transition:.4s;
+}
+
+.next-level{
+  font-size:13px;
+  color:#FF8F00;
+  margin-top:6px;
+  text-align:left;
+}
+
+.whatsapp-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:999px;
+  background:#25D366;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:20px;
+}
