@@ -178,7 +178,6 @@ function autoSize(){
 // =============================
 async function generateCarMembership() {
   const customerMembership = CUSTOMER.membership; // مثال: 20260001
-  const customerMembership = CUSTOMER.membership;
 
   const res = await apiGetAll("Cars");
   if (!res.success) return "C-" + customerMembership;
