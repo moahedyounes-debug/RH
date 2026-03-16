@@ -82,53 +82,59 @@ let PHONE = CUSTOMER ? CUSTOMER.phone : null;
 })();
 
 /* =============================
-   دالة موحدة: اليوم + التاريخ + الوقت
+   دالة تنظيف الوقت (الحل الثاني)
 ============================= */
-function parseBookingDateTime(rawDate, rawTime) {
-  let day = "";
-  let date = "";
-  let time = "";
+function cleanTime(rawTime) {
+  if (!rawTime) return "";
 
-  /* معالجة التاريخ */
-  let jsDate = null;
+  rawTime = String(rawTime).trim();
 
-  if (rawDate) {
-    // ISO مثل 2026-03-15
-    if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
-      jsDate = new Date(rawDate);
-    }
-    // نص مثل Mar/17/2026
-    else if (isNaN(rawDate)) {
-      jsDate = new Date(rawDate);
+  // لو الوقت نص جاهز مثل 14:30 أو 4:30 PM
+  if (rawTime.includes(":")) {
+    return rawTime.slice(0, 5); // نأخذ HH:MM فقط
+  }
+
+  // لو رقم Excel
+  if (!isNaN(rawTime)) {
+    const excelTime = Number(rawTime);
+    if (excelTime > 0 && excelTime < 1) {
+      const totalMinutes = Math.round(excelTime * 24 * 60);
+      const hh = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
+      const mm = String(totalMinutes % 60).padStart(2, "0");
+      return `${hh}:${mm}`;
     }
   }
 
-  if (jsDate && !isNaN(jsDate)) {
-    day = jsDate.toLocaleDateString("ar-SA", { weekday: "long" });
-    const month = jsDate.toLocaleString("en-US", { month: "short" });
-    const d = String(jsDate.getDate()).padStart(2, "0");
-    const y = jsDate.getFullYear();
-    date = `${month}/${d}/${y}`;
+  return "";
+}
+
+/* =============================
+   دالة تنسيق التاريخ
+============================= */
+function cleanDate(rawDate) {
+  if (!rawDate) return "";
+
+  // ISO
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+    const d = new Date(rawDate);
+    const month = d.toLocaleString("en-US", { month: "short" });
+    const day = String(d.getDate()).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${month}/${day}/${year}`;
   }
 
-  /* معالجة الوقت */
-  if (rawTime) {
-    // 12 ساعة مثل 4:30 PM
-    if (rawTime.includes("AM") || rawTime.includes("PM")) {
-      const t = new Date("2000-01-01 " + rawTime);
-      if (!isNaN(t)) {
-        const hh = String(t.getHours()).padStart(2, "0");
-        const mm = String(t.getMinutes()).padStart(2, "0");
-        time = `${hh}:${mm}`;
-      }
-    }
-    // 24 ساعة مثل 14:30
-    else if (/^\d{1,2}:\d{2}/.test(rawTime)) {
-      time = rawTime.slice(0, 5);
+  // نص مثل Mar/17/2026
+  if (isNaN(rawDate)) {
+    const d = new Date(rawDate);
+    if (!isNaN(d)) {
+      const month = d.toLocaleString("en-US", { month: "short" });
+      const day = String(d.getDate()).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${month}/${day}/${year}`;
     }
   }
 
-  return { day, date, time };
+  return rawDate;
 }
 
 /* =============================
@@ -150,18 +156,12 @@ window.onload = async function(){
   box.innerHTML = bookings.map(b => {
 
     const service = b[2];
-
-    const dt = parseBookingDateTime(b[3], b[4]);
-
-    const day  = dt.day;
-    const date = dt.date;
-    const time = dt.time;
-
+    const date = cleanDate(b[3]);
+    const time = cleanTime(b[4]);
     const status = b[5];
 
     return `
       <div class="booking-card">
-        <b>${day}</b><br>
         الخدمة: ${service}<br>
         التاريخ: ${date}<br>
         الوقت: ${time}<br>
