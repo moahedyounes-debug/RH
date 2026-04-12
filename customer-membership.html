@@ -105,7 +105,19 @@
 
 <script>
 
+/* ============================
+   قراءة العضوية من الرابط (مرحلة 7)
+============================ */
+
+const urlParams = new URLSearchParams(window.location.search);
+const membershipFromQR = urlParams.get("m");
+
 let CUSTOMER = JSON.parse(localStorage.getItem("customer") || "null");
+
+if (membershipFromQR) {
+  CUSTOMER = { membership: membershipFromQR };
+  localStorage.setItem("customer", JSON.stringify(CUSTOMER));
+}
 
 // لو ما فيه بيانات عميل → رجوع
 if(!CUSTOMER){
@@ -226,8 +238,8 @@ function renderCard() {
     </div>
   `;
 
-  // توليد QR محليًا
-  let qrValue = CUSTOMER.phone || CUSTOMER.membership || "NO_DATA";
+  // QR = رابط مباشر (مرحلة 7)
+  let qrValue = `https://moahedyounes-debug.github.io/RH/customer-membership.html?m=${CUSTOMER.membership}`;
 
   new QRious({
     element: document.getElementById("qrCanvas"),
