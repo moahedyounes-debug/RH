@@ -2,203 +2,47 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>🔧 صفحة الاختبارات الشاملة — Raghwa API</title>
+<title>إنشاء عضوية PassKit</title>
 
 <style>
 body { font-family: Tahoma; padding: 20px; background:#f2f2f2 }
-.card { background:#fff; padding:20px; margin-bottom:20px; border-radius:10px; border:1px solid #ccc }
-button { padding:10px 20px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; margin:5px }
+.card { background:#fff; padding:20px; border-radius:10px; border:1px solid #ccc; max-width:400px; margin:auto }
+button { padding:10px 20px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; width:100% }
 button:hover { background:#1e4fc7 }
-input, select { width:100%; padding:8px; margin:5px 0 10px; }
+input { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc }
 #result { white-space:pre-wrap; background:#fff; padding:15px; border-radius:10px; border:1px solid #ddd; margin-top:20px }
 </style>
 </head>
 
 <body>
 
-<h1>🔧 صفحة الاختبارات الشاملة — Raghwa API</h1>
+<div class="card">
+  <h2>🎫 إنشاء عضوية PassKit</h2>
+
+  <label>رقم الجوال</label>
+  <input id="phone" placeholder="05XXXXXXXX">
+
+  <button onclick="createMember()">إنشاء عضوية</button>
+
+  <pre id="result">— لا توجد نتائج بعد —</pre>
+</div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbybiK02cg7ifvNAPuQP9VzRiaKxxGQT5EU6iV2kZcWXvLKtqTBOfx5ObPCDfJAY6bP7SA/exec";
 
-async function callAPI(params) {
+async function createMember() {
+  const phone = document.getElementById("phone").value;
+
   const form = new URLSearchParams();
-  for (const k in params) form.append(k, params[k]);
+  form.append("action", "createPassForCustomerByPhone");
+  form.append("phone", phone);
 
   const res = await fetch(API, { method:"POST", body:form });
   const json = await res.json();
+
   document.getElementById("result").textContent = JSON.stringify(json, null, 2);
 }
 </script>
-
-<!-- ===========================
-     قسم PassKit
-=========================== -->
-<div class="card">
-  <h2>🎫 PassKit Tests</h2>
-
-  <label>رقم الجوال</label>
-  <input id="pk_phone" placeholder="05XXXXXXXX">
-
-  <button onclick="callAPI({action:'createPassForCustomerByPhone', phone:pk_phone.value})">
-    🔵 إنشاء بطاقة عضوية
-  </button>
-
-  <button onclick="callAPI({action:'getPassLinksByPhone', phone:pk_phone.value})">
-    🟢 جلب روابط البطاقة
-  </button>
-
-  <button onclick="testPassKitFull()">🟡 إنشاء + جلب الروابط</button>
-
-  <script>
-  async function testPassKitFull() {
-    const phone = pk_phone.value;
-    await callAPI({action:'createPassForCustomerByPhone', phone});
-    await callAPI({action:'getPassLinksByPhone', phone});
-  }
-  </script>
-</div>
-
-<!-- ===========================
-     قسم العملاء
-=========================== -->
-<div class="card">
-  <h2>👤 Customer Tests</h2>
-
-  <label>رقم الجوال</label>
-  <input id="c_phone">
-
-  <label>رقم العضوية</label>
-  <input id="c_mem">
-
-  <button onclick="callAPI({action:'getCustomerByPhone', phone:c_phone.value})">
-    🔍 البحث برقم الجوال
-  </button>
-
-  <button onclick="callAPI({action:'getCustomerByMembership', membership:c_mem.value})">
-    🔍 البحث برقم العضوية
-  </button>
-</div>
-
-<!-- ===========================
-     قسم السيارات
-=========================== -->
-<div class="card">
-  <h2>🚗 Car Tests</h2>
-
-  <label>رقم الجوال</label>
-  <input id="car_phone">
-
-  <label>رقم العضوية</label>
-  <input id="car_mem">
-
-  <button onclick="callAPI({action:'getCarsByPhone', phone:car_phone.value})">
-    🚗 جلب سيارات العميل
-  </button>
-
-  <button onclick="callAPI({action:'getCarByMembership', membership:car_mem.value})">
-    🚗 جلب سيارة حسب العضوية
-  </button>
-</div>
-
-<!-- ===========================
-     قسم الزيارات
-=========================== -->
-<div class="card">
-  <h2>🧽 Visits Tests</h2>
-
-  <button onclick="addVisitPaid()">➕ إضافة زيارة مدفوعة</button>
-  <button onclick="addVisitUnpaid()">➕ إضافة زيارة غير مدفوعة</button>
-  <button onclick="callAPI({action:'getActiveVisits'})">🔄 تحميل الزيارات النشطة</button>
-
-<script>
-async function addVisitPaid() {
-  callAPI({
-    action:"addVisit",
-    plate_numbers:"1111",
-    plate_letters:"أ ب ج",
-    car_type:"تويوتا",
-    car_model:"كامري",
-    car_size:"متوسط",
-    employee_in:"تجريبي",
-    branch:"مكة",
-    parking_slot:"A1",
-    payment_status:"مدفوع",
-    payment_method:"كاش",
-    discount:0,
-    tip:0,
-    cash_amount:70,
-    card_amount:0,
-    services:JSON.stringify([
-      {name:"خارجي", price:30, points:6, commission:5},
-      {name:"داخلي", price:40, points:8, commission:7}
-    ])
-  });
-}
-
-async function addVisitUnpaid() {
-  callAPI({
-    action:"addVisit",
-    plate_numbers:"2222",
-    plate_letters:"د ر س",
-    car_type:"هيونداي",
-    car_model:"سوناتا",
-    car_size:"متوسط",
-    employee_in:"تجريبي",
-    branch:"مكة",
-    parking_slot:"B2",
-    payment_status:"غير مدفوع",
-    payment_method:"",
-    discount:0,
-    tip:0,
-    cash_amount:0,
-    card_amount:0,
-    services:JSON.stringify([
-      {name:"خارجي", price:30, points:6, commission:5},
-      {name:"داخلي", price:40, points:8, commission:7}
-    ])
-  });
-}
-</script>
-</div>
-
-<!-- ===========================
-     Universal Tests
-=========================== -->
-<div class="card">
-  <h2>📄 Universal Tests</h2>
-
-  <label>اسم الشيت</label>
-  <input id="u_sheet" placeholder="Customers">
-
-  <label>رقم الصف</label>
-  <input id="u_row" placeholder="2">
-
-  <label>القيم (JSON)</label>
-  <input id="u_values" placeholder='["A","B","C"]'>
-
-  <button onclick="callAPI({action:'getAll', sheet:u_sheet.value})">
-    📄 getAll
-  </button>
-
-  <button onclick="callAPI({action:'addRow', sheet:u_sheet.value, values:u_values.value})">
-    ➕ addRow
-  </button>
-
-  <button onclick="callAPI({action:'updateRow', sheet:u_sheet.value, row:u_row.value, values:u_values.value})">
-    ✏ updateRow
-  </button>
-
-  <button onclick="callAPI({action:'deleteRow', sheet:u_sheet.value, row:u_row.value})">
-    ❌ deleteRow
-  </button>
-</div>
-
-<!-- ===========================
-     النتيجة
-=========================== -->
-<h2>📌 النتيجة</h2>
-<pre id="result">— لا توجد نتائج بعد —</pre>
 
 </body>
 </html>
