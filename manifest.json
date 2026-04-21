@@ -1,20 +1,22 @@
 {
-  "name": "Raghwet Al-Hyjin",
-  "short_name": "Raghwa",
-  "start_url": "customer-dashboard.html",
+  "name": "رغوة الهجين",
+  "short_name": "رغوة الهجين",
+  "description": "تطبيق مغسلة رغوة الهجين — مكة المكرمة",
+  "start_url": "customer-home.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "orientation": "portrait",
+  "background_color": "#080C14",
+  "theme_color": "#080C14",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["lifestyle", "utilities"],
   "icons": [
-    {
-      "src": "logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    { "name": "بطاقتي", "short_name": "البطاقة", "description": "بطاقة الولاء", "url": "customer-membership.html", "icons": [{"src": "logo.png", "sizes": "96x96"}] },
+    { "name": "حجز موعد", "short_name": "حجز", "description": "احجز موعد غسيل", "url": "customer-booking.html", "icons": [{"src": "logo.png", "sizes": "96x96"}] }
   ]
 }
