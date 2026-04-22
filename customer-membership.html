@@ -462,24 +462,30 @@ async function loadPassLinkFromSheet(phone){
     let appleRaw = null, googleRaw = null;
 
     for(const row of res.rows){
+      // نظّف رقم جوال الصف (يشيل أي apostrophe أو رموز)
       const rowPhone = String(row[0] || '').replace(/\D/g, '');
-      if(rowPhone === phoneNorm){
-        appleRaw  = row[1] || ''; // العمود B
-        googleRaw = row[2] || ''; // العمود C (إذا موجود)
+      if(rowPhone === phoneNorm && rowPhone !== ''){
+        appleRaw  = String(row[1] || '').trim(); // العمود B
+        googleRaw = String(row[2] || '').trim(); // العمود C
         break;
       }
     }
 
-    if(!appleRaw){
+    // لو العمود B فارغ وC فيه رابط → استخدم C للاثنين
+    if(!appleRaw && googleRaw) appleRaw = googleRaw;
+    // لو C فارغ وB فيه رابط → استخدم B للاثنين
+    if(!googleRaw && appleRaw) googleRaw = appleRaw;
+
+    if(!appleRaw && !googleRaw){
       console.warn('No PassLink found for phone:', phoneNorm);
       appleText.textContent  = 'غير متوفر';
       googleText.textContent = 'غير متوفر';
       return;
     }
 
-    // ⭐ بنّي الروابط الكاملة
+    // ⭐ بنّي الروابط الكاملة مع الـ prefix
     const appleUrl  = buildWalletUrl(appleRaw);
-    const googleUrl = googleRaw ? buildWalletUrl(googleRaw) : appleUrl;
+    const googleUrl = buildWalletUrl(googleRaw);
 
     console.log('Apple URL:',  appleUrl);
     console.log('Google URL:', googleUrl);
